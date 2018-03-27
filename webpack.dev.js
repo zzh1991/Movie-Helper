@@ -8,9 +8,9 @@ module.exports = {
   mode: 'development',
   entry: './src/main/script/index.js',
   output: {
-    path: path.resolve(__dirname, 'src/main/resources/static/built'),
+    // path: path.resolve(__dirname, 'src/main/resources/static/built'),
     filename: 'bundle.js',
-    publicPath: '/'
+    publicPath: '/built/'
   },
   devtool: 'inline-source-map',
   module: {
