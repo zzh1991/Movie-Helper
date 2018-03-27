@@ -4,3 +4,5 @@ target/
 src/test
 .mvn
 .idea
+node_modules/
+.vscode/
