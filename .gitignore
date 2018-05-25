@@ -6,3 +6,4 @@ src/test
 .idea
 node_modules/
 .vscode/
+src/main/resources/static/built/

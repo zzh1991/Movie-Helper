@@ -10,7 +10,9 @@ module.exports = {
   entry: './src/main/script/index.js',
   output: {
     path: path.resolve(__dirname, 'src/main/resources/static'),
-    filename: 'built/bundle.[hash].js',
+    // filename: 'built/bundle.[hash].js',
+    filename: 'built/[name].bundle.[hash].js',
+    chunkFilename: 'built/[name].bundle.[hash].js',
     publicPath: '/',
   },
   // devtool: 'source-map',
