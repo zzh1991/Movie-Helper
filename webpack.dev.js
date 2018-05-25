@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const port = process.env.PORT || 3000;
 
 module.exports = {
@@ -67,6 +68,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+    // new BundleAnalyzerPlugin(),
   ],
   devServer: {
     host: '0.0.0.0',

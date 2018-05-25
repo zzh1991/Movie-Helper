@@ -16,6 +16,12 @@ class MovieController(val movieService: MovieService) {
         movieService.syncRecentMovies()
     }
 
+    @PostMapping("sync/top")
+    @Throws(IOException::class)
+    fun syncTop() {
+        movieService.syncTopMovies()
+    }
+
     @GetMapping("/movie/recent")
     @Throws(IOException::class)
     fun getRecentMovie(): List<Film> {
@@ -46,11 +52,16 @@ class MovieController(val movieService: MovieService) {
 
     @PostMapping("/movie/star")
     fun getStarList(@RequestBody movieIdList: List<Long>): List<FilmList> {
-        return movieService.getSepecificFilmList(movieIdList)
+        return movieService.getSpecificFilmList(movieIdList)
     }
 
     @PostMapping("/movie/viewed")
     fun getViewedList(@RequestBody movieIdList: List<Long>): List<FilmList> {
-        return movieService.getSepecificFilmList(movieIdList)
+        return movieService.getSpecificFilmList(movieIdList)
+    }
+
+    @PostMapping("movie/sync/{movieId}")
+    fun syncOneMovieToMovieList(@PathVariable movieId: Long): FilmList {
+        return movieService.syncOneMovieToMovieList(movieId)
     }
 }

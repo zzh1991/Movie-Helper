@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 const port = process.env.PORT || 3000;
 
@@ -8,11 +9,11 @@ module.exports = {
   mode: 'production',
   entry: './src/main/script/index.js',
   output: {
-    path: path.resolve(__dirname, 'src/main/resources/static/built'),
-    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'src/main/resources/static'),
+    filename: 'built/bundle.[hash].js',
     publicPath: '/',
   },
-  devtool: 'source-map',
+  // devtool: 'source-map',
   module: {
     rules: [
       {
@@ -72,7 +73,12 @@ module.exports = {
   //     }
   //   }
   // },
-  plugins: [],
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/main/resources/html-template/index.html',
+      filename: '../templates/index.html',
+    }),
+    new CleanWebpackPlugin('./src/main/resources/static/built/*.*', {})],
   devServer: {
     host: '0.0.0.0',
     port: port,

@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository
 interface FilmRepository : CrudRepository<Film, Long> {
     fun findByCurrentIsTrueOrderByRatingDesc(): List<Film>
 
-    fun findOneByMovieId(id: Long?): Film?
+    fun findFirstByMovieIdOrderByIdDesc(id: Long?): Film?
 }
