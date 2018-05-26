@@ -3,13 +3,12 @@ import { connect } from 'react-redux';
 import { Spin } from 'antd';
 import { fetchMovieRecent, syncRecentMovieList } from '../actions/actions';
 import Main from '../containers/main';
-import '../styles/style.css';
 import SideBar from '../components/sidebar.js';
 
 class SideBarContainer extends Component {
   componentDidMount() {
     this.props.dispatch(fetchMovieRecent.request());
-  };
+  }
 
   onSync = () => {
     this.props.dispatch(syncRecentMovieList());
@@ -19,7 +18,7 @@ class SideBarContainer extends Component {
     const { data, loading } = this.props;
     return (
       <SideBar
-        keys={'/'}
+        keys="/"
         showSyncButton
         syncMovies={this.onSync}
       >

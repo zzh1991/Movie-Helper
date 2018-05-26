@@ -245,7 +245,7 @@ class MovieService(
     }
 
     private fun getFilmLists(movieIdList: List<Long>): List<FilmList> {
-        val filmLists = filmListRepository.findByMovieIdIsIn(movieIdList)
+        val filmLists = filmListRepository.findByMovieIdIsInOrderByIdDesc(movieIdList)
         if (filmLists.isEmpty()) {
             for (movieId in movieIdList) {
                 this.syncOneMovieToMovieList(movieId)
@@ -260,7 +260,11 @@ class MovieService(
                 }
             }
         }
-        return filmListRepository.findByMovieIdIsIn(movieIdList)
+        return filmListRepository.findByMovieIdIsInOrderByIdDesc(movieIdList)
+                .asSequence()
+                .distinctBy { it.movieId }
+                .sortedByDescending { it.rating }
+                .toList()
     }
 
     private fun getRecentFilmList(movieList: List<Movie>, filmList: MutableList<Film>,

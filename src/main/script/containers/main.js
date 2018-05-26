@@ -1,7 +1,6 @@
 import React from 'react';
-import { Table,Button } from 'antd';
+import { Table, Button } from 'antd';
 import { connect } from 'react-redux';
-import '../styles/style.css';
 import { fetchMovieViewed, saveMovieToLocal, deleteMovieToLocal, getMovieList } from '../actions/actions';
 import MovieDetail from '../components/movieDetail';
 
@@ -44,24 +43,40 @@ const starMovieName = 'starMovieList';
 
 class Main extends React.Component {
   state = {
-    current: 1,
-    index: -1,
     watchedMovieSet: getMovieList(watchedMovieName),
     starMovieSet: getMovieList(starMovieName),
   };
 
-  onChange = (pagination, filters, sorter) => {
-  };
-
-  onRowClick = (record, index, event) => {
-    this.setState({ index });
-  };
-
-  rowClassName = (record, index) => {
-    if (index === this.state.index) {
-      return 'clicked';
+  setViewOrStarState = (movieListName, id) => {
+    if (movieListName === watchedMovieName) {
+      const set = this.state.watchedMovieSet;
+      set.add(id);
+      this.setState({
+        watchedMovieSet: set,
+      });
+    } else {
+      const set = this.state.starMovieSet;
+      set.add(id);
+      this.setState({
+        starMovieSet: set,
+      });
     }
-    return '';
+  };
+
+  setUnviewOrUnstarState = (movieListName, id) => {
+    if (movieListName === watchedMovieName) {
+      const set = this.state.watchedMovieSet;
+      set.delete(id);
+      this.setState({
+        watchedMovieSet: set,
+      });
+    } else {
+      const set = this.state.starMovieSet;
+      set.delete(id);
+      this.setState({
+        starMovieSet: set,
+      });
+    }
   };
 
   updateCheck = (isChecked, id, movieListName) => {
@@ -79,38 +94,6 @@ class Main extends React.Component {
     }
   };
 
-  setViewOrStarState = (movieListName, id) => {
-    if (movieListName === watchedMovieName) {
-      const set = this.state.watchedMovieSet;
-      set.add(id);
-      this.setState({
-        watchedMovieSet: set,
-      });
-    } else {
-      const set = this.state.starMovieSet;
-      set.add(id);
-      this.setState({
-        starMovieSet: set,
-      });
-    }
-  }
-
-  setUnviewOrUnstarState = (movieListName, id) => {
-    if (movieListName === watchedMovieName) {
-      const set = this.state.watchedMovieSet;
-      set.delete(id);
-      this.setState({
-        watchedMovieSet: set,
-      });
-    } else {
-      const set = this.state.starMovieSet;
-      set.delete(id);
-      this.setState({
-        starMovieSet: set,
-      });
-    }
-  }
-
   render() {
     const columns = [
       {
@@ -118,7 +101,7 @@ class Main extends React.Component {
         key: 'name',
         dataIndex: 'title',
         render: (text, record) => {
-          return <a href={record.url} target={'_blank'}>{text}</a>;
+          return <a href={record.url} target="_blank" >{text}</a>;
         },
         width: 200,
       },
@@ -160,17 +143,17 @@ class Main extends React.Component {
             <Button
               shape="circle"
               icon="eye"
-              onClick={() => {this.updateCheck(!isChecked,
-              record.movieId, watchedMovieName);}}
-            />}
+              onClick={() => { this.updateCheck(!isChecked, record.movieId, watchedMovieName); }}
+            />
+            }
             {!isChecked &&
             <Button
               shape="circle"
               icon="eye-o"
-              onClick={() => {this.updateCheck(!isChecked,
-                record.movieId, watchedMovieName);}}
-            />}
-            </span>);
+              onClick={() => { this.updateCheck(!isChecked, record.movieId, watchedMovieName); }}
+            />
+            }
+          </span>);
         },
         width: 100,
         filters: [
@@ -200,15 +183,13 @@ class Main extends React.Component {
             <Button
               shape="circle"
               icon="heart"
-              onClick={() => {this.updateCheck(!isChecked,
-                record.movieId, starMovieName);}}
+              onClick={() => { this.updateCheck(!isChecked, record.movieId, starMovieName); }}
             />}
             {!isChecked &&
             <Button
               shape="circle"
               icon="heart-o"
-              onClick={() => {this.updateCheck(!isChecked,
-                record.movieId, starMovieName);}}
+              onClick={() => { this.updateCheck(!isChecked, record.movieId, starMovieName); }}
             />}
           </span>);
         },
@@ -254,24 +235,11 @@ class Main extends React.Component {
           columns={columns}
           dataSource={data}
           pagination={{
-            pageSize: 9,
-            current: this.state.current,
-            defaultCurrent: 1,
-            total: data ? data.length : 0,
-            showSizeChanger: true,
-            onShowSizeChange: () => {},
-            onChange: (page) => {
-              this.setState({
-                current: page,
-              });
-            },
+            pageSize: 8,
           }}
-
-          // onChange={this.onChange}
-          // onRowClick={this.onRowClick}
-          // rowClassName={'table-content'}
           expandedRowRender={record => <MovieDetail record={record} />}
           scroll={{ y: '75vh' }}
+          rowKey={row => row.id}
         />
       </div>
     );

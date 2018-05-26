@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { ActionTypes } from '../actions/actionTypes';
 
-function studentData (state = {data: []}, action) {
+function studentData(state = { data: [] }, action) {
   switch (action.type) {
     case ActionTypes.FETCH_DATA_REQUEST:
       return {
@@ -21,9 +21,9 @@ function studentData (state = {data: []}, action) {
     default:
       return state;
   }
-};
+}
 
-function movieRecentList (state = {data: [], loading: false}, action) {
+function movieRecentList(state = { data: [], loading: false }, action) {
   switch (action.type) {
     case ActionTypes.FETCH_MOVIE_RECENT_REQUEST:
     case ActionTypes.SYNC_MOVIE_RECENT_REQUEST:
@@ -47,9 +47,9 @@ function movieRecentList (state = {data: [], loading: false}, action) {
     default:
       return state;
   }
-};
+}
 
-function movieTopList (state = {data: [], loading: false}, action) {
+function movieTopList(state = { data: [], loading: false }, action) {
   switch (action.type) {
     case ActionTypes.FETCH_MOVIE_TOP_REQUEST:
     case ActionTypes.SYNC_MOVIE_TOP_REQUEST:
@@ -62,20 +62,20 @@ function movieTopList (state = {data: [], loading: false}, action) {
       return {
         ...state,
         data: action.data,
-        loading: false
+        loading: false,
       };
     case ActionTypes.FETCH_MOVIE_TOP_FAILURE:
       return {
         ...state,
         data: [],
-        loading: false
+        loading: false,
       };
     default:
       return state;
   }
-};
+}
 
-function movieViewedList (state = {data: [], loading: false}, action) {
+function movieViewedList(state = { data: [], loading: false }, action) {
   switch (action.type) {
     case ActionTypes.FETCH_VIEWED_MOVIE_LIST_REQUEST:
       return {
@@ -98,9 +98,9 @@ function movieViewedList (state = {data: [], loading: false}, action) {
     default:
       return state;
   }
-};
+}
 
-function movieStarList (state = {data: [], loading: false}, action) {
+function movieStarList(state = { data: [], loading: false }, action) {
   switch (action.type) {
     case ActionTypes.FETCH_STAR_MOVIE_LIST_REQUEST:
       return {
@@ -123,7 +123,7 @@ function movieStarList (state = {data: [], loading: false}, action) {
     default:
       return state;
   }
-};
+}
 
 export default combineReducers({
   studentData,

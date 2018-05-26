@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository
 interface FilmListRepository : CrudRepository<FilmList, Long> {
     fun findFirstByMovieId(movieId: Long?): FilmList?
 
-    fun findByMovieIdIsIn(ids: List<Long>): List<FilmList>
+    fun findByMovieIdIsInOrderByIdDesc(ids: List<Long>): List<FilmList>
 }

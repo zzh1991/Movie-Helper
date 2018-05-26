@@ -9,22 +9,22 @@ class MovieDetail extends Component {
         <img src={record.imageLarge} alt={record.imageLarge} />
         {/* <p><a href={record.imageLarge} target={'_blank'}>{record.title}</a></p> */}
         <CastsInfo>
-          <h3>{'主演'}</h3>
+          <h3>主演</h3>
           {
             record.casts.split(',').map((cast) => {
               return <Author key={cast} >{cast}</Author>;
             })
           }
-          <h3>{'导演'}</h3>
+          <h3>导演</h3>
           {
             record.directors.split(',').map((director) => {
               return <Author key={director} >{director}</Author>;
             })
           }
           <hr />
-          <h3>{'简介'}</h3>
+          <h3>简介</h3>
           <p>{record.summary}</p>
-          <h3>{'国家'}</h3>
+          <h3>国家</h3>
           <p>{record.countries}</p>
         </CastsInfo>
       </ExtraInfo>

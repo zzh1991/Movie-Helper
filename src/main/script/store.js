@@ -1,9 +1,9 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
-import createSagaMiddleware from 'redux-saga'
+import createSagaMiddleware from 'redux-saga';
 import thunkMiddleware from 'redux-thunk';
 import logger from 'redux-logger';
 import reducer from './reducers/reducer';
-import HelloSaga from './sagas/sagas'
+import HelloSaga from './sagas/sagas';
 
 const combinedReducer = combineReducers({
   info: reducer,

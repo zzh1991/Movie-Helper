@@ -2,15 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Layout, Icon, Menu, Button } from 'antd';
 import { withRouter } from 'react-router-dom';
-import '../styles/style.css';
 
 const { Header, Content, Sider } = Layout;
 class SideBar extends React.Component {
+  static defaultProps = {
+    showSyncButton: false,
+  }
+
   constructor(props) {
     super(props);
     this.state = {
-      open: true,
-      openMenu: false,
       collapsed: false,
     };
   }
@@ -49,13 +50,22 @@ class SideBar extends React.Component {
             {'  电影助手'}
           </div>
           {this.props.showSyncButton &&
-          <div style={{
-            display: 'grid',
-            marginRight: -30,
-            justifyItems: 'end',
-            alignItems: 'center',
-          }} >
-            <Button icon="sync" ghost style={{ width: '7vw' }} onClick={this.props.syncMovies}>SYNC</Button>
+          <div
+            style={{
+              display: 'grid',
+              marginRight: -30,
+              justifyItems: 'end',
+              alignItems: 'center',
+            }}
+          >
+            <Button
+              icon="sync"
+              ghost
+              onClick={this.props.syncMovies}
+              className="sync-button"
+            >
+              SYNC
+            </Button>
           </div>
           }
         </Header>
@@ -65,7 +75,12 @@ class SideBar extends React.Component {
             collapsible
             collapsed={this.state.collapsed}
           >
-            <Menu theme="dark" mode="inline" onClick={this.clickMenu} defaultSelectedKeys={[this.props.keys]}>
+            <Menu
+              theme="dark"
+              mode="inline"
+              onClick={this.clickMenu}
+              defaultSelectedKeys={[this.props.keys]}
+            >
               <Menu.Item key="/">
                 <Icon type="home" />
                 <span>上映电影</span>

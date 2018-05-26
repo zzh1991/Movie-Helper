@@ -38,7 +38,7 @@ const Routes = () => (
           <Route path="/top" component={TopMoviesContainer} />
           <Route path="/view" component={ViewedMoviesContainer} />
           <Route path="/star" component={StarMoviesContainer} />
-          <Route path='/404' component={NotFound} />
+          <Route path="/404" component={NotFound} />
           <Redirect to="/404" />
         </Switch>
       </div>
