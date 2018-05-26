@@ -5,6 +5,9 @@
     <h3 align="center">Movie Helper</h3>
     <p align="center">
         <a href="https://github.com/zzh1991/Movie-Helper/blob/master/LICENSE"><img src="https://img.shields.io/github/license/zzh1991/Movie-Helper.svg"></a>
+        <a href="#"><img src="https://img.shields.io/github/languages/top/zzh1991/Movie-Helper.svg"></a>
+        <a href="#"><img src="https://img.shields.io/github/languages/count/zzh1991/Movie-Helper.svg"></a>
+        <a href="#"><img src="https://img.shields.io/github/search/zzh1991/Movie-Helper/goto.svg"></a>
         <a href="https://github.com/zzh1991/Movie-Helper/blob/master/.travis.yml"><img src="https://img.shields.io/travis/zzh1991/Movie-Helper/master.svg"></a>
     </p>
     <p align="center">
