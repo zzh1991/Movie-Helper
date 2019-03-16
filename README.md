@@ -32,7 +32,7 @@ git submodule update
 
 ### update submodule
 ```bash
-git fetch origin/master
+git fetch origin master
 git rebase origin/master
 
 # or
