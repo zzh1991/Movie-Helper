@@ -15,7 +15,7 @@ class MovieController(val movieService: MovieService) {
         movieService.syncMovies(MovieTypeEnum.RECENT)
     }
 
-    @PostMapping("sync/top")
+    @PostMapping("/sync/top")
     @Throws(IOException::class)
     fun syncTop() {
         movieService.syncMovies(MovieTypeEnum.TOP)
@@ -31,6 +31,12 @@ class MovieController(val movieService: MovieService) {
     @Throws(IOException::class)
     fun getTopMovie(): List<FilmList> {
         return movieService.getFilmList(MovieTypeEnum.TOP)
+    }
+
+    @GetMapping("/movie/all")
+    @Throws(IOException::class)
+    fun getAllMovies(): List<FilmList> {
+        return movieService.getAllMoviesList()
     }
 
     @GetMapping("/movie/subject/{id}")
