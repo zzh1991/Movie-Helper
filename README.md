@@ -16,14 +16,33 @@
 </p>
 
 ## How to use
-1. configure you database name (an empty database) in application.properties
-2. yarn: install node module
-3. yarn start: bundle the js
+1. `git clone --recursive git@github.com:zzh1991/Movie-Helper.git`
+```bash
+# or
+git clone git@github.com:zzh1991/Movie-Helper.git
+git submodule init
+git submodule update
+```
+1. configure you database name (an empty database), user, password in `src/main/resources/application.properties`
+2. cd front
+3. yarn: install dependency
+3. yarn start: open the front app
 4. start the web app in IDE
 5. go to [http://localhost:3000](http://localhost:3000)
 
+### update submodule
+```bash
+git fetch origin/master
+git rebase origin/master
+
+# or
+git submodule update --remote front
+```
+
 ## How to deploy
+1. cd front
 1. yarn deploy
+1. cd ../
 2. mvn install
 
 ## Implement
@@ -32,7 +51,7 @@
     1. easy to understand
     2. improve the code quality
 
-### [Front end](https://github.com/zzh1991/React-SpringBoot/blob/master/README.md)
+### [Front end](https://github.com/zzh1991/movie-helper-front)
 This repository has packaged the Javascript code
 - React 16
 - Ant Design 3
@@ -42,3 +61,7 @@ This repository has packaged the Javascript code
 ![Recent](pictures/recent-movie.png)
 ### Top 100 Movies
 ![Top](pictures/top-movie.png)
+
+## Others
+### submodule detail
+git submodule add git@github.com:zzh1991/movie-helper-front.git front

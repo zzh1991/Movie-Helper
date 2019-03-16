@@ -10,4 +10,6 @@ interface FilmListRepository : CrudRepository<FilmList, Long> {
     fun findByMovieIdIsInOrderByIdDesc(ids: List<Long>): List<FilmList>
 
     fun findByMovieTypeEnumOrderByRatingDesc(movieTypeEnum: MovieTypeEnum): List<FilmList>
+
+    fun findAllByOrderByMovieYearDescRatingDesc(): List<FilmList>
 }

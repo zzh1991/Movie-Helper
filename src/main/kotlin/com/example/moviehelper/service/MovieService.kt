@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 
-
 @Service
 class MovieService(
         val filmListRepository: FilmListRepository
@@ -79,7 +78,7 @@ class MovieService(
     private fun batchUpdateFilmList(newFilmList: List<FilmList>) {
         if (newFilmList.isNotEmpty()) {
             filmListRepository.saveAll(newFilmList)
-            log.info("update {} movie items summary and country", newFilmList.size)
+            log.info("update {} movie items", newFilmList.size)
         }
     }
 
@@ -91,13 +90,9 @@ class MovieService(
                 .filter { film -> film.summary.isNullOrEmpty() }
                 .map { film -> CompletableFuture.supplyAsync {
                     getMovieSubject(film.movieId)
-                }.thenApply { movieSubject -> {
-                    if (movieSubject !== null) {
-                        film.summary = movieSubject.summary
-                        film.countries = movieSubject.countries.joinToString(separator = separator)
-                    }
-                } }
-                }.toList()
+                }
+                        .thenApply { getDetail(it, film, newFilmList); it }
+                }
 
 
         for (future in completableFuture) {
@@ -107,10 +102,20 @@ class MovieService(
             } catch (e: Exception) {
                 log.error("get movie summary error")
             }
-
         }
 
         batchUpdateFilmList(newFilmList)
+    }
+
+    private fun getDetail(movieSubject: MovieSubject?, film: FilmList, newFilmList: MutableList<FilmList>): Boolean {
+        if (movieSubject !== null) {
+            film.summary = movieSubject.summary
+            film.countries = movieSubject.countries.joinToString(separator = separator)
+            newFilmList.add(film)
+            return true
+        } else {
+            return false
+        }
     }
 
     @Throws(IOException::class)
@@ -145,6 +150,10 @@ class MovieService(
         return filmListRepository.findByMovieTypeEnumOrderByRatingDesc(movieTypeEnum)
     }
 
+    fun getAllMoviesList(): List<FilmList> {
+        return filmListRepository.findAllByOrderByMovieYearDescRatingDesc()
+    }
+
     fun getFilmListById(id : Long) : FilmList? {
         return filmListRepository.findFirstByMovieId(id)
     }
@@ -166,7 +175,6 @@ class MovieService(
         } catch (e: Exception) {
             return null
         }
-
         return movieSubject
     }
 
