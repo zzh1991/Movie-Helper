@@ -1,5 +1,7 @@
 package com.example.moviehelper.entity
 
+import com.example.moviehelper.constant.MovieTypeEnum
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -18,7 +20,9 @@ class FilmList(
         _summary: String? = null,
         _countries: String? = null,
         _viewed: Boolean? = false,
-        _star: Boolean? = false
+        _star: Boolean? = false,
+        _updateTime: Date? = Date(System.currentTimeMillis()),
+        _movieTypeEnum: MovieTypeEnum? = null
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +40,12 @@ class FilmList(
     var countries = _countries
     var viewed = _viewed
     var star = _star
+
+    @Temporal(TemporalType.TIMESTAMP)
+    var updateTime = _updateTime
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "movie_type")
+    var movieTypeEnum = _movieTypeEnum
+
 }

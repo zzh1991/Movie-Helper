@@ -1,8 +1,7 @@
 package com.example.moviehelper.controller
 
-import com.example.moviehelper.entity.Film
+import com.example.moviehelper.constant.MovieTypeEnum
 import com.example.moviehelper.entity.FilmList
-import com.example.moviehelper.entity.TopFilm
 import com.example.moviehelper.service.MovieService
 import com.example.moviehelper.vo.MovieSubject
 import org.springframework.web.bind.annotation.*
@@ -13,25 +12,25 @@ class MovieController(val movieService: MovieService) {
     @PostMapping("/sync/recent")
     @Throws(IOException::class)
     fun syncRecent() {
-        movieService.syncRecentMovies()
+        movieService.syncMovies(MovieTypeEnum.RECENT)
     }
 
     @PostMapping("sync/top")
     @Throws(IOException::class)
     fun syncTop() {
-        movieService.syncTopMovies()
+        movieService.syncMovies(MovieTypeEnum.TOP)
     }
 
     @GetMapping("/movie/recent")
     @Throws(IOException::class)
-    fun getRecentMovie(): List<Film> {
-        return movieService.getFilmList()
+    fun getRecentMovie(): List<FilmList> {
+        return movieService.getFilmList(MovieTypeEnum.RECENT)
     }
 
     @GetMapping("/movie/top250")
     @Throws(IOException::class)
-    fun getTopMovie(): List<TopFilm> {
-        return movieService.getTopFilmList()
+    fun getTopMovie(): List<FilmList> {
+        return movieService.getFilmList(MovieTypeEnum.TOP)
     }
 
     @GetMapping("/movie/subject/{id}")

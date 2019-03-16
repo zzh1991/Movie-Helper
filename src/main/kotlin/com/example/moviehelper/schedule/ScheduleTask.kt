@@ -1,5 +1,6 @@
 package com.example.moviehelper.schedule
 
+import com.example.moviehelper.constant.MovieTypeEnum
 import com.example.moviehelper.service.MovieService
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -14,7 +15,7 @@ class ScheduleTask(val movieService: MovieService) {
     @Scheduled(cron = "0 0 22 * * ?", zone = "GMT+8")
     fun updateMovie() {
         try {
-            movieService.syncRecentMovies()
+            movieService.syncMovies(MovieTypeEnum.RECENT)
             log.info("update movie successfully")
         } catch (e: Exception) {
             log.error("update movie failed: {}", e.message)
@@ -25,7 +26,7 @@ class ScheduleTask(val movieService: MovieService) {
     @Scheduled(cron = "0 30 22 * * ?", zone = "GMT+8")
     fun updateTopMovie() {
         try {
-            movieService.syncTopMovies()
+            movieService.syncMovies(MovieTypeEnum.TOP)
             log.info("update top movie successfully")
         } catch (e: Exception) {
             log.error("update top movie failed: {}", e.message)
