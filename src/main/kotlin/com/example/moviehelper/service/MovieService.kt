@@ -138,7 +138,7 @@ class MovieService(
                 .build()
 
         val response = client.newCall(request).execute()
-        return response.body()!!.string()
+        return response.body!!.string()
     }
 
     private fun getNames(avatars: List<Avatar>): String {

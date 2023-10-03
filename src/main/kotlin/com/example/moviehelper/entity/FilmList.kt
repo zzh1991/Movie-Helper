@@ -1,8 +1,8 @@
 package com.example.moviehelper.entity
 
 import com.example.moviehelper.constant.MovieTypeEnum
+import jakarta.persistence.*
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "movie_list")
