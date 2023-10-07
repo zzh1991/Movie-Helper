@@ -6,56 +6,58 @@
     <p align="center">
         <a href="https://github.com/zzh1991/Movie-Helper/blob/master/LICENSE"><img src="https://img.shields.io/github/license/zzh1991/Movie-Helper.svg"></a>
         <a href="#"><img src="https://img.shields.io/github/languages/top/zzh1991/Movie-Helper.svg"></a>
-        <a href="#"><img src="https://img.shields.io/github/languages/count/zzh1991/Movie-Helper.svg"></a>
-        <a href="#"><img src="https://img.shields.io/github/search/zzh1991/Movie-Helper/goto.svg"></a>
-        <a href="https://github.com/zzh1991/Movie-Helper/blob/master/.travis.yml"><img src="https://img.shields.io/travis/zzh1991/Movie-Helper/master.svg"></a>
     </p>
     <p align="center">
         Movie management and find valueable movies to watch<br>
     </p>
 </p>
 
-## How to use
-1. `git clone --recursive git@github.com:zzh1991/Movie-Helper.git`
-```bash
-# or
-git clone git@github.com:zzh1991/Movie-Helper.git
-git submodule init
-git submodule update
-```
-1. configure you database name (an empty database), user, password in `src/main/resources/application.properties`
-2. cd front
-3. yarn: install dependency
-3. yarn start: open the front app
-4. start the web app in IDE
-5. go to [http://localhost:3000](http://localhost:3000)
+## Git clone repo (optional)
+Front-end project: [movie-helper-front](https://github.com/zzh1991/movie-helper-front)
 
-### update submodule
 ```bash
-cd front
+# cd React-SpringBoot/
+git clone https://github.com/zzh1991/movie-helper-front.git
+```
+
+#### Configure Front
+
+- `cd movie-helper-front`
+- `npm install`: install dependency
+- prepare front static files
+  - dev mode
+    - `npm run dev`
+  - Deploy mode
+    - `npm run deploy`
+- start the web app in IDE
+- open browser
+  - `dev mode`: go to http://localhost:3000
+  - `deploy mode`: go to http://localhost:8080
+
+### Update front end
+
+```bash
+cd movie-helper-front
 git fetch origin master
 git rebase origin/master
-
-# or
-git submodule update --remote front
 ```
-
-## How to deploy
-1. cd front
-1. yarn deploy
-1. cd ../
-2. mvn install
 
 ## Implement
 ### Back end
 - Kotlin: refactor back end code
     1. easy to understand
     2. improve the code quality
+- Spring Boot 3
+- PostgresQL
+- Guava
+- Swagger
+- Flyway
 
-### [Front end](https://github.com/zzh1991/movie-helper-front)
-This repository has packaged the Javascript code
-- React 16
-- Ant Design 3
+## Endpoints
+
+### Swagger UI
+
+- http://localhost:8080/swagger-ui/index.html
 
 ## Demo: [Movie Helper](http://movie.zzhpro.com)
 ### Recent Movies
@@ -63,6 +65,17 @@ This repository has packaged the Javascript code
 ### Top 100 Movies
 ![Top](pictures/top-movie.png)
 
-## Others
-### submodule detail
-git submodule add git@github.com:zzh1991/movie-helper-front.git front
+## Author
+
+👤 **Zhihao Zhang**
+
+- Github: [@zzh1991](https://github.com/zzh1991)
+
+## Show your support
+
+Please ⭐️ this repository if this project helped you!
+
+## 📝 License
+
+Copyright © 2023 [zzh1991](https://github.com/zzh1991).<br />
+This project is [MIT](https://github.com/zzh1991/Movie-Helper/blob/master/LICENSE) licensed.
