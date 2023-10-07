@@ -27,6 +27,7 @@
 		<common.io.version>2.14.0</common.io.version>
 		<kotlinx.coroutines.version>1.7.3</kotlinx.coroutines.version>
 		<openapi.version>2.2.0</openapi.version>
+		<jsoup.version>1.16.1</jsoup.version>
 	</properties>
 
 	<dependencies>
@@ -34,6 +35,11 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${openapi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>${jsoup.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -110,7 +116,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-    </dependencies>
+	</dependencies>
 
 	<build>
 		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>

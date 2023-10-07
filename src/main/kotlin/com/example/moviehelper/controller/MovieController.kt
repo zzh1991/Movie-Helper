@@ -1,7 +1,7 @@
 package com.example.moviehelper.controller
 
 import com.example.moviehelper.constant.MovieTypeEnum
-import com.example.moviehelper.entity.FilmList
+import com.example.moviehelper.entity.Film
 import com.example.moviehelper.service.MovieService
 import com.example.moviehelper.vo.MovieSubject
 import org.springframework.web.bind.annotation.*
@@ -23,19 +23,19 @@ class MovieController(val movieService: MovieService) {
 
     @GetMapping("/movie/recent")
     @Throws(IOException::class)
-    fun getRecentMovie(): List<FilmList> {
+    fun getRecentMovie(): List<Film> {
         return movieService.getFilmList(MovieTypeEnum.RECENT)
     }
 
     @GetMapping("/movie/top250")
     @Throws(IOException::class)
-    fun getTopMovie(): List<FilmList> {
+    fun getTopMovie(): List<Film> {
         return movieService.getFilmList(MovieTypeEnum.TOP)
     }
 
     @GetMapping("/movie/all")
     @Throws(IOException::class)
-    fun getAllMovies(): List<FilmList> {
+    fun getAllMovies(): List<Film> {
         return movieService.getAllMoviesList()
     }
 
@@ -51,22 +51,22 @@ class MovieController(val movieService: MovieService) {
     }
 
     @GetMapping("/list/{id}")
-    fun getFilmListById(@PathVariable id: Long?): FilmList? {
+    fun getFilmListById(@PathVariable id: Long?): Film? {
         return movieService.getFilmListById(id!!)
     }
 
     @PostMapping("/movie/star")
-    fun getStarList(@RequestBody movieIdList: List<Long>): List<FilmList> {
+    fun getStarList(@RequestBody movieIdList: List<Long>): List<Film> {
         return movieService.getSpecificFilmList(movieIdList)
     }
 
     @PostMapping("/movie/viewed")
-    fun getViewedList(@RequestBody movieIdList: List<Long>): List<FilmList> {
+    fun getViewedList(@RequestBody movieIdList: List<Long>): List<Film> {
         return movieService.getSpecificFilmList(movieIdList)
     }
 
     @PostMapping("movie/sync/{movieId}")
-    fun syncOneMovieToMovieList(@PathVariable movieId: Long): FilmList {
+    fun syncOneMovieToMovieList(@PathVariable movieId: Long): Film {
         return movieService.syncOneMovieToMovieList(movieId)
     }
 }

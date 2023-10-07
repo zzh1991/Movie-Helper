@@ -2,131 +2,82 @@ package com.example.moviehelper.service
 
 import com.example.moviehelper.constant.MovieTypeEnum
 import com.example.moviehelper.dao.FilmListRepository
-import com.example.moviehelper.entity.FilmList
+import com.example.moviehelper.entity.Film
+import com.example.moviehelper.utils.JsoupUtils
 import com.example.moviehelper.vo.Avatar
-import com.example.moviehelper.vo.Movie
 import com.example.moviehelper.vo.MovieSubject
-import com.example.moviehelper.vo.MovieVo
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.type.TypeFactory
+import com.google.common.base.Strings
+import com.google.common.collect.Lists
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.apache.tomcat.util.threads.ThreadPoolExecutor
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.util.CollectionUtils
 import java.io.IOException
+import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
+import java.util.stream.Collectors
 
 @Service
 class MovieService(
-        val filmListRepository: FilmListRepository
+        val filmListRepository: FilmListRepository,
+        val jsoupUtils: JsoupUtils
 ) {
     private val separator = ","
     private val large = "large"
     private val log = LoggerFactory.getLogger(this.javaClass.name)
 
+    private val executorService: ExecutorService = ThreadPoolExecutor(
+        2, 2, 60, TimeUnit.SECONDS,
+        LinkedBlockingQueue()
+    )
+
     fun syncMovies(movieTypeEnum: MovieTypeEnum) {
-        saveMovies(movieTypeEnum)
+        val filmList: List<Film> = if (MovieTypeEnum.TOP == movieTypeEnum) {
+            jsoupUtils.topFilmListFromDouban()
+        } else if (MovieTypeEnum.RECENT == movieTypeEnum) {
+            jsoupUtils.filmListFromDouban()
+        } else {
+            return
+        }
+        if (CollectionUtils.isEmpty(filmList)) {
+            return
+        }
+        deleteOutDatedMovie(movieTypeEnum)
+        saveFilmList(filmList)
         saveDetailToMovie(movieTypeEnum)
     }
 
-    private fun saveMovies(movieTypeEnum: MovieTypeEnum) {
-        var url = "https://api.douban.com/v2/movie/in_theaters?city=上海"
-        if (MovieTypeEnum.TOP == movieTypeEnum) {
-            url = "https://api.douban.com/v2/movie/top250?start=0&count=100"
-        }
-        val movieList = getMovies(url)
-        if (movieList.isNotEmpty()) {
-            this.deleteOutDataMovie(movieTypeEnum)
-        }
-        this.saveFilmList(movieList, movieTypeEnum)
-    }
-
-    private fun deleteOutDataMovie(movieTypeEnum: MovieTypeEnum) {
-        val filmList = filmListRepository.findByMovieTypeEnumOrderByRatingDesc(movieTypeEnum)
-        filmList.forEach { film -> film.movieTypeEnum = MovieTypeEnum.NORMAL }
+    private fun deleteOutDatedMovie(movieTypeEnum: MovieTypeEnum) {
+        val filmList: List<Film> = filmListRepository.findByMovieTypeEnumOrderByRatingDesc(movieTypeEnum)
+        filmList.forEach(Consumer { film: Film -> film.movieTypeEnum = MovieTypeEnum.NORMAL })
         filmListRepository.saveAll(filmList)
-        log.info("set old recent {} movies to normal movies", filmList.size)
+        log.info("set old {} {} movies to normal movies", movieTypeEnum, filmList.size)
     }
 
-    private fun saveFilmList(movieList: List<Movie>, movieTypeEnum: MovieTypeEnum) {
-        val filmList = mutableListOf<FilmList>()
-        for (movie in movieList) {
-            val film = filmListRepository.findFirstByMovieId(movie.id)
-            val newFilm = FilmList(
-                    _movieId = movie.id,
-                    _title = movie.title,
-                    _rating = movie.rating?.average,
-                    _url = movie.alt,
-                    _movieYear = movie.year,
-                    _imageLarge = movie.images[large],
-                    _casts = getNames(movie.casts),
-                    _directors = getNames(movie.directors),
-                    _genres = movie.genres.joinToString(separator = separator),
-                    _movieTypeEnum = movieTypeEnum
-            )
-            if (film !== null) {
-                newFilm.countries = film.countries
-                newFilm.summary = film.summary
-                newFilm.id = film.id
-            }
-            filmList.add(newFilm)
+    private fun saveFilmList(movieList: List<Film>) {
+        val filmList = mutableListOf<Film>()
+        for (film in movieList) {
+            val oldFilm = filmListRepository.findFirstByMovieId(film.movieId)
+            film.transformMovieAndOldFilmToNewFilm(oldFilm)
+            filmList.add(film)
         }
         batchUpdateFilmList(filmList)
     }
 
-    private fun batchUpdateFilmList(newFilmList: List<FilmList>) {
+    private fun batchUpdateFilmList(newFilmList: List<Film>) {
         if (newFilmList.isNotEmpty()) {
             filmListRepository.saveAll(newFilmList)
             log.info("update {} movie items", newFilmList.size)
         }
-    }
-
-    @Throws(IOException::class)
-    private fun saveDetailToMovie(movieTypeEnum: MovieTypeEnum) {
-        val filmList = filmListRepository.findByMovieTypeEnumOrderByRatingDesc(movieTypeEnum)
-        val newFilmList = mutableListOf<FilmList>()
-        val completableFuture = filmList.asSequence()
-                .filter { film -> film.summary.isNullOrEmpty() }
-                .map { film -> CompletableFuture.supplyAsync {
-                    getMovieSubject(film.movieId)
-                }
-                        .thenApply { getDetail(it, film, newFilmList); it }
-                }
-
-
-        for (future in completableFuture) {
-            try {
-                val fetchStatus = future.get()
-                log.warn("update summary success: {}", fetchStatus)
-            } catch (e: Exception) {
-                log.error("get movie summary error")
-            }
-        }
-
-        batchUpdateFilmList(newFilmList)
-    }
-
-    private fun getDetail(movieSubject: MovieSubject?, film: FilmList, newFilmList: MutableList<FilmList>): Boolean {
-        if (movieSubject !== null) {
-            film.summary = movieSubject.summary
-            film.countries = movieSubject.countries.joinToString(separator = separator)
-            newFilmList.add(film)
-            return true
-        } else {
-            return false
-        }
-    }
-
-    @Throws(IOException::class)
-    fun getMovies(url: String): List<Movie> {
-        var movieVo: MovieVo?
-        val context = getUrlContent(url)
-        val mapper = ObjectMapper()
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        movieVo = mapper.readValue<MovieVo>(context,
-                TypeFactory.defaultInstance().constructType(MovieVo::class.java))
-        return movieVo.subjects
     }
 
     @Throws(IOException::class)
@@ -146,19 +97,19 @@ class MovieService(
         return nameList.joinToString(separator = separator)
     }
 
-    fun getFilmList(movieTypeEnum: MovieTypeEnum): List<FilmList> {
+    fun getFilmList(movieTypeEnum: MovieTypeEnum): List<Film> {
         return filmListRepository.findByMovieTypeEnumOrderByRatingDesc(movieTypeEnum)
     }
 
-    fun getAllMoviesList(): List<FilmList> {
+    fun getAllMoviesList(): List<Film> {
         return filmListRepository.findAllByOrderByMovieYearDescRatingDesc()
     }
 
-    fun getFilmListById(id : Long) : FilmList? {
+    fun getFilmListById(id : Long) : Film? {
         return filmListRepository.findFirstByMovieId(id)
     }
 
-    fun getSpecificFilmList(movieIdList: List<Long>) : List<FilmList> {
+    fun getSpecificFilmList(movieIdList: List<Long>) : List<Film> {
         return this.getFilmLists(movieIdList)
     }
 
@@ -168,7 +119,7 @@ class MovieService(
         val context = getUrlContent(url)
         val mapper = ObjectMapper()
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        var movieSubject: MovieSubject?
+        val movieSubject: MovieSubject?
         try {
             movieSubject = mapper.readValue<MovieSubject>(context,
                     TypeFactory.defaultInstance().constructType(MovieSubject::class.java))
@@ -178,10 +129,10 @@ class MovieService(
         return movieSubject
     }
 
-    fun syncOneMovieToMovieList(movieId: Long): FilmList {
+    fun syncOneMovieToMovieList(movieId: Long): Film {
         val filmList = filmListRepository.findFirstByMovieId(movieId)
         val movieSubject: MovieSubject?
-        var syncedMovie = FilmList()
+        var syncedMovie = Film()
         try {
             movieSubject = getMovieSubject(movieId)
         } catch (e: IOException) {
@@ -189,7 +140,7 @@ class MovieService(
         }
 
         if (movieSubject !== null) {
-            syncedMovie = FilmList(
+            syncedMovie = Film(
                     _movieId = movieSubject.id,
                     _title = movieSubject.title,
                     _rating = movieSubject.rating?.average,
@@ -214,7 +165,7 @@ class MovieService(
         return filmListRepository.save(syncedMovie)
     }
 
-    private fun getFilmLists(movieIdList: List<Long>): List<FilmList> {
+    private fun getFilmLists(movieIdList: List<Long>): List<Film> {
         val filmLists = filmListRepository.findByMovieIdIsInOrderByIdDesc(movieIdList)
         if (filmLists.isEmpty()) {
             for (movieId in movieIdList) {
@@ -222,7 +173,7 @@ class MovieService(
             }
         } else {
             val existedIdList = filmLists.asSequence()
-                    .map(FilmList::movieId)
+                    .map(Film::movieId)
                     .toList()
             for (movieId in movieIdList) {
                 if (!existedIdList.contains(movieId)) {
@@ -235,5 +186,43 @@ class MovieService(
                 .distinctBy { it.movieId }
                 .sortedByDescending { it.rating }
                 .toList()
+    }
+
+    private fun saveDetailToMovie(movieTypeEnum: MovieTypeEnum) {
+        val filmList: List<Film> = filmListRepository.findByMovieTypeEnumOrderByRatingDesc(movieTypeEnum)
+        val newFilmList: MutableList<Film> = Lists.newArrayList()
+        val completableFuture = filmList.stream()
+            .filter { film: Film -> Strings.isNullOrEmpty(film.summary) }
+            .map { film: Film ->
+                CompletableFuture.supplyAsync(
+                    {
+                        film.url?.let {
+                            jsoupUtils
+                                .getFilmDetailByMovieTypeAndUrl(movieTypeEnum, it)
+                        }
+                    },
+                    executorService
+                ).thenApply { movieSubject: Film? ->
+                    if (Objects.nonNull(movieSubject)) {
+                        film.transformMovieAndOldFilmToNewFilm(movieSubject)
+                        newFilmList.add(film)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+            .collect(Collectors.toList())
+        for (future in completableFuture) {
+            try {
+                val fetchStatus = future.get()
+                log.warn("update summary success: {}", fetchStatus)
+            } catch (e: InterruptedException) {
+                Thread.currentThread().interrupt()
+            } catch (e: java.lang.Exception) {
+                log.error("get movie summary error", e)
+            }
+        }
+        batchUpdateFilmList(newFilmList)
     }
 }
